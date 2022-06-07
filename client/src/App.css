@@ -1,0 +1,53 @@
+.App {
+  min-height: 100vh;
+  background-color: #ffffff;
+  color: #1f1f1f;
+}
+
+.Navbar {
+  min-height: 10vh;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+.Content {
+  min-height: 80vh;
+}
+
+.Menu {
+  min-height: 80vh;
+  margin-right: 8px;
+}
+
+.Drawer {
+  min-height: 80vh;
+  margin: 16px 16px 16px 16px;
+}
+
+.Favorite {
+  color: #ff4f4f
+}
+
+.logo:link {
+  color: white;
+  text-decoration: none;
+}
+
+.logo:active {
+  color: white;
+  text-decoration: none;
+}
+
+.logo:visited {
+  color: white;
+  text-decoration: none;
+}
+
+.logo:visited {
+  color: white;
+  text-decoration: none;
+}
+
+.navItem {
+  text-decoration: none;
+}

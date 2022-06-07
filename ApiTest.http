@@ -1,0 +1,25 @@
+GET http://localhost:3001/api/films
+
+### 
+
+GET http://localhost:3001/api/films/favorites
+
+### 
+
+GET http://localhost:3001/api/films/bestrated
+
+### 
+
+GET http://localhost:3001/api/films/unseen
+
+### 
+
+POST  http://localhost:3001/api/films
+Content-Type: : application/json
+
+{
+    "title": "Interstellar",
+    "favorite": 1,
+    "rating": 5,
+    "watchDate": "2022-05-30"
+}
