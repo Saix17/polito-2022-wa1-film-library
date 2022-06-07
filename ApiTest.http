@@ -1,20 +1,20 @@
-GET http://localhost:3001/api/films
+GET http://localhost:3001/api/v1/films
 
 ### 
 
-GET http://localhost:3001/api/films/favorites
+GET http://localhost:3001/api/v1/films/favorites
 
 ### 
 
-GET http://localhost:3001/api/films/bestrated
+GET http://localhost:3001/api/v1/films/bestrated
 
 ### 
 
-GET http://localhost:3001/api/films/unseen
+GET http://localhost:3001/api/v1/films/unseen
 
 ### 
 
-POST  http://localhost:3001/api/films
+POST  http://localhost:3001/api/v1/films
 Content-Type: : application/json
 
 {
