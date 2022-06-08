@@ -49,6 +49,7 @@ GET /api/v1/films
 retrieve the details of the all single film
 
 Request body: empty
+
 Response body: array of Film objects, in JSON
 
 Error: 500 Interal server error
@@ -60,6 +61,7 @@ GET /api/v1/films/favorites
 retrieve the details of the only favorites films
 
 Request body: empty
+
 Response body: array of Film objects in which favorite is true, in JSON
 
 Error: 500 Interal server error
@@ -71,6 +73,7 @@ GET /api/films/lastmonth
 retrieve the details of the film watched last mounth
 
 Request body: empty
+
 Response body: array of Film objects in which isSeenLastMonth is true, in JSON
 
 Error: 500 Interal server error
@@ -82,6 +85,7 @@ GET /api/films/bestrated
 retrieve the details of the film which are best rated
 
 Request body: empty
+
 Response body: array of Film objects in which rating is equal to 5, in JSON
 
 Error: 500 Interal server error
@@ -93,6 +97,7 @@ GET /api/films/unseen
 retrieve the details of the film which are not seen yet
 
 Request body: empty
+
 Response body: array of Film objects in which unseen is true, in JSON
 
 Error: 500 Interal server error
@@ -104,6 +109,7 @@ GET /api/films/:id
 retrieve the details of a single film, given its id
 
 Request body: empty
+
 Response body: array of Film objects, in JSON
 
 Error: 500 Interal server error
@@ -115,6 +121,7 @@ POST /api/films
 add a completely new film (new unique id)
 
 Request body: JSON of a new film
+
 Response body: none (error code, if an error occurs)
 
 Error: 400 Not found
@@ -126,6 +133,7 @@ PUT /api/films
 update an existing film, by providing information
 
 Request body: JSON of film object
+
 Response body: none (error code, if an error occurs)
 
 Error: 400 Not found
@@ -137,6 +145,7 @@ PUT /api/films/:id
 update the favorite property of a film, given the id
 
 Request body: JSON of film object
+
 Response body:none (error code, if an error occurs)
 
 Error: 400 Not found
@@ -148,6 +157,7 @@ DELETE /api/films/:id
 delete information about one specific exam, given the id
 
 Request body: empty
+
 Response body: empty (error code, if an error occurs)
 
 Error: 400 Not found
