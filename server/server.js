@@ -1,24 +1,83 @@
 'use strict';
 
-const PORT = 3001;
-
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
 const { validationResult, body, param } = require('express-validator');
+const filmDao = require('./dao/daoFilm');
+const userDao = require('./dao/daoUser');
+const passport = require('passport');
+const LocalStrategy = require('passport-local');
+const session = require('express-session');
 
-const dao = require('./dao/daoFilm');
-
+const PORT = 3001;
 const app = express();
-app.use(morgan('common'));
+
+app.use(morgan('dev'));
 app.use(express.json());
-app.use(cors());
+
+const corsOptions = {
+    origin: 'http://localhost:3000',
+    credentials: true,
+};
+app.use(cors(corsOptions));
+
+passport.use(new LocalStrategy(async function verify(username, password, cb) {
+    const user = await userDao.getUser(username, password)
+    if (!user)
+        return cb(null, false, 'Incorrect username or password.');
+    return cb(null, user);
+}));
+
+passport.serializeUser(function (user, cb) {
+    cb(null, user);
+});
+
+passport.deserializeUser(function (user, cb) {
+    return cb(null, user);
+    // if needed, we can do extra check here (e.g., double check that the user is still in the database, etc.)
+});
+
+const isLoggedIn = (req, res, next) => {
+    if (req.isAuthenticated()) {
+        return next();
+    }
+    return res.status(401).json({ error: 'Not authorized' });
+}
+
+app.use(session({
+    secret: "shhhhh... it's a secret!",
+    resave: false,
+    saveUninitialized: false,
+  }));
+  app.use(passport.authenticate('session'));
 
 const PREFIX = '/api/v1';
 
-app.get(PREFIX + '/films', (req, res) => {
-    dao.getAll().then(values =>
+/*** USER APIs ***/
 
+app.post(PREFIX +'/sessions', passport.authenticate('local'), (req, res) => {
+    res.status(201).json(req.user);
+  });
+
+app.get(PREFIX +'/sessions/current', (req, res) => {
+    if(req.isAuthenticated()) {
+      res.json(req.user);}
+    else
+      res.status(401).json({error: 'Not authenticated'});
+});
+
+app.delete(PREFIX + '/sessions/current', (req, res) => {
+    req.logout(() => {
+      res.end();
+    });
+  });
+
+
+/*** FILM APIs ***/
+
+app.get(PREFIX + '/films', isLoggedIn, (req, res) => {
+    filmDao.getAll().then(values =>
         res.json(values)
     ).catch(
         (err) => {
@@ -27,8 +86,8 @@ app.get(PREFIX + '/films', (req, res) => {
     );
 });
 
-app.get(PREFIX + '/films/favorites', (req, res) => {
-    dao.getFavorites().then(
+app.get(PREFIX + '/films/favorites',isLoggedIn, (req, res) => {
+    filmDao.getFavorites().then(
         (value) => {
             res.json(value);
         }
@@ -39,8 +98,8 @@ app.get(PREFIX + '/films/favorites', (req, res) => {
     );
 });
 
-app.get(PREFIX + '/films/lastmonth', (req, res) => {
-    dao.getAll().then(
+app.get(PREFIX + '/films/lastmonth', isLoggedIn, (req, res) => {
+    filmDao.getAll().then(
         (value) => value.filter(v => v.isSeenLastMonth))
         .then(valuelm => {
             console.log(valuelm);
@@ -54,8 +113,8 @@ app.get(PREFIX + '/films/lastmonth', (req, res) => {
 });
 
 
-app.get(PREFIX + '/films/bestrated', (req, res) => {
-    dao.getBestRated().then(
+app.get(PREFIX + '/films/bestrated', isLoggedIn, (req, res) => {
+    filmDao.getBestRated().then(
         (value) => {
             res.json(value);
         }
@@ -66,8 +125,8 @@ app.get(PREFIX + '/films/bestrated', (req, res) => {
     );
 });
 
-app.get(PREFIX + '/films/unseen', (req, res) => {
-    dao.getUnseen().then(
+app.get(PREFIX + '/films/unseen', isLoggedIn, (req, res) => {
+    filmDao.getUnseen().then(
         (value) => {
             res.json(value);
         }
@@ -78,16 +137,17 @@ app.get(PREFIX + '/films/unseen', (req, res) => {
     );
 });
 
-app.get(PREFIX + '/films/:id',[
-    param('id').isNumeric()
+app.get(PREFIX + '/films/:id', [
+    param('id').isNumeric(),
+    isLoggedIn
 ], (req, res) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
-    
-    dao.getById(req.params.id).then(
+
+    filmDao.getById(req.params.id).then(
         (value) => {
             console.log(value.title);
             res.json(value);
@@ -99,16 +159,17 @@ app.get(PREFIX + '/films/:id',[
     );
 });
 
-app.post(PREFIX + '/films',[
+app.post(PREFIX + '/films', [
     body('title').not().isEmpty(),
     body('favorite').isNumeric(),
     body('rating').isNumeric(),
     body('watchDate').isISO8601(),
-    body('user').isNumeric()
+    body('user').isNumeric(),
+    isLoggedIn
 ], async (req, res) => {
     const film = req.body;
     try {
-        const value = await dao.addFilm(film);
+        const value = await filmDao.addFilm(film);
         res.end();
     } catch (e) {
         res.status(400).json({ error: e });
@@ -121,7 +182,8 @@ app.put(PREFIX + '/films', [
     body('favorite').isNumeric(),
     body('rating').isNumeric(),
     body('watchDate').isISO8601(),
-    body('user').isNumeric()
+    body('user').isNumeric(),
+    isLoggedIn
 ], async (req, res) => {
 
     const errors = validationResult(req);
@@ -130,15 +192,16 @@ app.put(PREFIX + '/films', [
     }
     const film = req.body;
     try {
-        const value = await dao.updateFilm(film);
+        const value = await filmDao.updateFilm(film);
         res.end();
     } catch (e) {
         res.status(400).json({ error: e });
     }
 });
 
-app.put(PREFIX + '/films/:id',[
-    param('id').isNumeric()
+app.put(PREFIX + '/films/:id', [
+    param('id').isNumeric(),
+    isLoggedIn
 ], async (req, res) => {
 
     const errors = validationResult(req);
@@ -150,7 +213,7 @@ app.put(PREFIX + '/films/:id',[
         dao.getById(req.params.id).then(
             v => {
                 v.favorite = (v.favorite + 1) % 2;
-                dao.updateFilm(v);
+                filmDao.updateFilm(v);
                 res.end();
             }
         )
@@ -159,8 +222,9 @@ app.put(PREFIX + '/films/:id',[
     }
 });
 
-app.delete(PREFIX + '/films/:id',[
-    param('id').isNumeric()
+app.delete(PREFIX + '/films/:id', [
+    param('id').isNumeric(),
+    isLoggedIn
 ], async (req, res) => {
 
     const errors = validationResult(req);
@@ -169,7 +233,7 @@ app.delete(PREFIX + '/films/:id',[
     }
 
     try {
-        const value = await dao.removeFilm(req.params.id);
+        const value = await filmDao.removeFilm(req.params.id);
         res.end();
     } catch (e) {
         res.status(400).json({ error: e })
