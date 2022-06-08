@@ -1,6 +1,6 @@
 const dayjs = require('dayjs');
 
-function Film(id, title, isFavorite = false, watchDate = '', rating = 0, user) {
+function Film(id, title, isFavorite = false, watchDate = null, rating = 0, user) {
     this.id = id;
     this.title = title;
     this.favorite = isFavorite;
@@ -8,9 +8,9 @@ function Film(id, title, isFavorite = false, watchDate = '', rating = 0, user) {
     this.watchDate = watchDate && dayjs(watchDate);
     this.user = user;
 
-    this.isBestRated = ()=> this.rating === 5
-    this.isSeenLastMonth = this.watchDate !== '' ? this.watchDate.add(30, 'day').isAfter(dayjs()) : false
-    this.isUnseen = this.watchDate === ''
+    this.isBestRated = this.rating === 5 ? true : false;
+    this.isSeenLastMonth = this.watchDate !== null ? this.watchDate.add(30, 'day').isAfter(dayjs()) : false;
+    this.isUnseen = this.watchDate === '';
 }
 
 function FilmLibrary() {

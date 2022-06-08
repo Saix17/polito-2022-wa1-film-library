@@ -1,0 +1,55 @@
+GET http://localhost:3001/api/v1/films
+
+###
+GET http://localhost:3001/api/v1/films/6
+
+### 
+
+GET http://localhost:3001/api/v1/films/favorites
+
+### 
+
+GET http://localhost:3001/api/v1/films/bestrated
+
+### 
+
+GET http://localhost:3001/api/v1/films/lastmonth
+
+### 
+
+GET http://localhost:3001/api/v1/films/unseen
+
+### 
+
+POST  http://localhost:3001/api/v1/films
+Content-Type:application/json
+
+{
+    "title": "Interstellar",
+    "favorite": 1,
+    "rating": 5,
+    "watchDate": "2022-05-30",
+    "user": 1
+}
+
+###
+
+PUT http://localhost:3001/api/v1/films
+Content-Type: application/json
+
+{
+    "id": 7,
+    "title": "motorino",
+    "favorite": 1,
+    "rating": 5,
+    "watchDate": "2022-05-30",
+    "user": 1
+}
+
+###
+
+PUT http://localhost:3001/api/v1/films/6
+
+###
+
+DELETE http://localhost:3001/api/v1/films/6

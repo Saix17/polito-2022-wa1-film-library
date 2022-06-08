@@ -1,7 +1,6 @@
 'use strict';
 
 const sqlite = require('sqlite3');
-//const dayjs = require('dayjs');
 const {Film} = require('../Film');
 
 const db = new sqlite.Database('films.db', (err) => {
@@ -18,7 +17,7 @@ function getAll(){
                 reject(err);
             } else {
                 resolve(rows.map((f) =>
-                    new Film(f.id, f.title, f.favorite, f.watchDate, f.rating, f.user),
+                    new Film(f.id, f.title, f.favorite, f.watchdate, f.rating, f.user),
                 ));
             }
         });
@@ -33,7 +32,6 @@ function getFavorites(){
                 reject(err);
             }
             else{
-                console.log(rows)
                 resolve(rows.map((f) =>
                 new Film(f.id, f.title, f.favorite, f.watchDate, f.rating, f.user),
                 ));
@@ -41,22 +39,6 @@ function getFavorites(){
         })
     })
 }
-
-//function getSeenLastMonth(){
-//     const sql = "SELECT * FROM films WHERE ";
-//     return new Promise ((resolve, reject) => {
-//         db.all(sql, [], (err, rows) => {
-//             if(err){
-//                 reject(err);
-//             }
-//             else{
-//                 resolve(rows.map((f) =>
-//                     new Film(f.id, f.title, f.favorite, f.watchDate, f.rating, f.user),
-//                 ));
-//             }
-//         })
-//     })
-// }
 
 function getBestRated(){
     const sql = "SELECT * FROM films WHERE rating = 5";
@@ -93,25 +75,28 @@ function getUnseen(){
 function getById(id){
     const sql = 'SELECT * FROM films WHERE id=?';
     return new Promise((resolve, reject) => {
-        db.all(sql, [id], (err, rows) => {
+        db.all(sql, [id], (err, row) => {
             if (err) {
                 reject(err);
             } else {
-                if (rows.length > 0) {
-                    resolve(rows.map((f) =>
-                    new Film(f.id, f.title, f.favorite, f.watchDate, f.rating, f.user),
-                ));
-                }
-            }
-        });
+                row.length > 0 ?
+                    resolve(new Film(
+                        row[0].id, 
+                        row[0].title, 
+                        row[0].favorite, 
+                        row[0].watchdate, 
+                        row[0].rating, 
+                        row[0].user))
+                : resolve (1);  
+        }});
     });
 }
 
 
 function addFilm(film) {
     return new Promise((resolve, reject) => {
-        const sql = 'INSERT INTO films (id, title, favorite, watchDate, rating) VALUES( ?,?,?,?,?)';
-        db.run(sql, [film.title, film.favorite, film.watchDate, film.rating], (err) => {
+        const sql = 'INSERT INTO films (title, favorite, watchdate, rating, user) VALUES(?,?,?,?,?)';
+        db.run(sql, [film.title, film.favorite, film.watchDate, film.rating, film.user], (err) => {
             if (err) {
                 console.log(err);
                 reject(err);
@@ -122,9 +107,9 @@ function addFilm(film) {
     });
 }
 
-function modifyFilm(id, name, favorite, date, rating) {
-    const sql = "UPDATE films SET name = ?, favorite = ?, date = ?, rating = ? WHERE id = ?"
-    const list = [name, favorite, date, rating, id];
+function updateFilm(film) {
+    const sql = "UPDATE films SET title = ?, favorite = ?, watchdate = ?, rating = ?, user = ? WHERE id = ?"
+    const list = [film.title, film.favorite, film.watchDate, film.rating, film.user, film.id];
     return new Promise((resolve, reject) => {
         db.run(sql, list, (err) => {
             if(err){
@@ -172,7 +157,7 @@ module.exports = {
      getUnseen,
      getById,
      addFilm,
-     modifyFilm,
+     updateFilm,
      setFavorite,
      removeFilm
     };
