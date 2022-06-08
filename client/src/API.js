@@ -21,14 +21,14 @@ async function readFilms() {
     }
 }
 
-/*
 
-async function addExam(exam) {
-    const url = APIURL + '/exams';
+
+async function addFilm(film) {
+    const url = APIURL + '/films';
     try {
         const response = await fetch(url, {
             method: 'POST',
-            body: JSON.stringify(exam),
+            body: JSON.stringify(film),
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -43,6 +43,8 @@ async function addExam(exam) {
         throw ex;
     }
 }
+
+/*
 
 async function editExam(exam) {
     const url = APIURL + '/exams';
@@ -82,5 +84,5 @@ async function removeExam(code) {
     }
 }*/
 
-const API = { readFilms };
+const API = { readFilms, addFilm};
 export default API ;

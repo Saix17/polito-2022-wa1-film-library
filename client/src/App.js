@@ -40,8 +40,13 @@ function App() {
     setFilms((oldFilms) => (oldFilms.filter((f) => (f.id !== film.id))));
   }
 
-  const addFilm = (film) => {
-    setFilms((oldFilms) => [...oldFilms, film]);
+  const addFilm = async (film) => {
+    try {
+      await API.addFilm(film);
+      reloadFilms();
+    } catch (e) {
+      throw(e);
+    }
   }
 
   const editFilm = (film) => {
@@ -62,8 +67,6 @@ function App() {
     setEditedFilm(film)
     setMode('edit')
   }
-
-  const nextIdFilm = () => Math.max(...films.map(f => f.id)) + 1
 
   const filterFilms = function (filt) {
     switch (filt) {
@@ -93,7 +96,7 @@ function App() {
           <Route path='/best_rated' element={<FilmsPage filt={'best_rated'} films={filterFilms('best_rated')} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} />} />
           <Route path='/seen_last_month' element={<FilmsPage filt={'seen_last_month'} films={filterFilms('seen_last_month')} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} />} />
           <Route path='/unseen' element={<FilmsPage filt={'unseen'} films={filterFilms('unseen')} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} />} />
-          <Route path='/addFilm' element={<AddFilmPage mode={mode} setMode={setMode} nextId={nextIdFilm} addFilm={addFilm} />} />
+          <Route path='/addFilm' element={<AddFilmPage mode={mode} setMode={setMode} addFilm={addFilm} />} />
           <Route path='/editFilm' element={<EditFilmPage key={editedFilm.id} mode={mode} setMode={setMode} editFilm={editFilm} editedFilm={editedFilm} />} />
           <Route path='*' element={<h1>404 Page not found</h1>} />
         </Route>
@@ -151,7 +154,6 @@ function AddFilmPage(props) {
           <AddFilmForm
             mode={props.mode}
             setMode={props.setMode}
-            nextId={props.nextId}
             addFilm={props.addFilm}
           />
         </div>

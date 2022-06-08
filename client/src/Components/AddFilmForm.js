@@ -13,19 +13,29 @@ function AddFilmForm(props) {
 
     const handleSubmit = (event) => {
         event.preventDefault();
-        var id = 0;
         if (props.mode === 'edit') {
-            id = props.editedFilm.id
+            /*
+            var id = props.editedFilm.id
+            props.editFilm({
+                "id": id,
+                "title": title,
+                "favorite": favorite,
+                "rating": parseInt(rating),
+                "watchDate": watchDate,
+                "user": 1
+            });
+            */
         }
-        else if (props.mode === 'add') {
-            id = props.nextId()
-        }
-        const f = new Film(id, title, favorite, watchDate, parseInt(rating));
-        if (props.mode === 'edit') {
-            props.editFilm(f);
-        }
-        else if (props.mode === 'add') {
-            props.addFilm(f);
+        
+        
+        if (props.mode === 'add') {
+            props.addFilm({
+                "title": title,
+                "favorite": favorite,
+                "rating": parseInt(rating),
+                "watchDate": watchDate,
+                "user": 1
+            });
         }
 
         setTitle('');
