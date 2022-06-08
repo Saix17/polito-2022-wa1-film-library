@@ -2,12 +2,11 @@ import { Film } from "./Components/Film";
 
 const APIURL = 'http://localhost:3001/api/v1';
 
-async function readFilms() {
-    const url = APIURL + '/films';
+async function readFilms(filt) {
+    var url = APIURL + '/films/' + (filt ?? '');
     try {
         const response = await fetch(url);
         if (response.ok) {
-
             const list = await response.json();
             console.log(list)
             const filmList = list.map((f) => new Film(f.id, f.title, f.favorite, f.watchDate, f.rating));
@@ -20,8 +19,6 @@ async function readFilms() {
         throw ex;
     }
 }
-
-
 
 async function addFilm(film) {
     const url = APIURL + '/films';
