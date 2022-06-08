@@ -5,7 +5,7 @@ import { Col, Row, Container } from 'react-bootstrap';
 
 
 import { load_data } from './Components/Load_data';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { MyNavbar } from './Components/Navbar';
 import { Sidebar } from './Components/SideBar';
 import FilmTable from './Components/FilmTable';
@@ -13,13 +13,28 @@ import { AddButton } from './Components/AddButton';
 import { AddFilmForm } from './Components/AddFilmForm';
 import { Film } from './Components/Film';
 
+import API from './API'
+
 const filmsData = load_data();
 
 function App() {
-  const [films, setFilms] = useState(filmsData.filmList);
+  const [loading, setLoading] = useState(true);
+  const [films, setFilms] = useState([]);
+
   //const [filt, setFilt] = useState("");
   const [mode, setMode] = useState("show");
   const [editedFilm, setEditedFilm] = useState(new Film(1, "Pulp Fiction", true, "2022-03-10", 5));
+
+  async function reloadFilms() {
+    //setLoading(true);
+    const list = await API.readFilms()
+    setFilms(list);
+    setLoading(false);
+  }
+
+  useEffect(() => {
+    reloadFilms();
+  }, []);
 
   const removeFilm = (film) => {
     setFilms((oldFilms) => (oldFilms.filter((f) => (f.id !== film.id))));
