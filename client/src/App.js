@@ -139,18 +139,14 @@ function App() {
 
 
   return (
-    <Container>
-      {loggedIn && <LogoutButton logout={handleLogout} />}
-      {message && <Row>
-        <Alert variant={message.type} onClose={() => setMessage('')} dismissible>{message.msg}</Alert>
-      </Row>}
+    <div className="App">
       <BrowserRouter>
         <Routes>
           <Route path='/login' element={
             loggedIn ? <Navigate replace to='/' /> : <LoginForm login={handleLogin} />
           } />
 
-          <Route element={<AppLayout />}>
+          <Route element={<AppLayout loggedIn={loggedIn} handleLogout={handleLogout} message={message} setMessage={setMessage} />}>
             <Route path='/' element={loggedIn ? <FilmsPage filt={''} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
             <Route path='/favorites' element={loggedIn ? <FilmsPage filt={'favorites'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
             <Route path='/bestrated' element={loggedIn ? <FilmsPage filt={'bestrated'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
@@ -164,7 +160,7 @@ function App() {
 
         </Routes>
       </BrowserRouter >
-    </Container>
+    </div>
   );
 }
 
@@ -246,7 +242,11 @@ function EditFilmPage(props) {
 
 function AppLayout(props) {
   return (
-    <div className="App">
+    <div>
+      {props.loggedIn && <LogoutButton logout={props.handleLogout} />}
+      {props.message && <Row>
+        <Alert variant={props.message.type} onClose={() => props.setMessage('')} dismissible>{props.message.msg}</Alert>
+      </Row>}
       <MyNavbar />
       <Container className="Content" fluid>
         <Outlet />
