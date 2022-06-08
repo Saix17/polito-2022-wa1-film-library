@@ -1,7 +1,7 @@
 import './App.css';
 import React from 'react';
-import { BrowserRouter, Outlet, Route, Routes } from 'react-router-dom';
-import { Col, Row, Container } from 'react-bootstrap';
+import { BrowserRouter, Outlet, Route, Routes, Navigate } from 'react-router-dom';
+import { Col, Row, Container, Alert } from 'react-bootstrap';
 
 
 import { load_data } from './Components/Load_data';
@@ -14,11 +14,15 @@ import { AddFilmForm } from './Components/AddFilmForm';
 import { Film } from './Components/Film';
 
 import API from './API'
+import { LoginForm, LogoutButton } from './Components/Auth';
 
 const filmsData = load_data();
 
 function App() {
   const [loading, setLoading] = useState(true);
+  const [loggedIn, setLoggedIn] = useState(false);
+  const [message, setMessage] = useState('');
+
   const [films, setFilms] = useState([]);
 
   const [filt, setFilt] = useState("");
@@ -32,10 +36,25 @@ function App() {
     setLoading(false);
   }
 
+
   useEffect(() => {
-    reloadFilms(filt);
+    const checkAuth = async () => {
+      await API.getUserInfo();
+      setLoggedIn(true);
+    };
+    checkAuth();
+  }, []);
+
+
+  useEffect(() => {
+    if (loggedIn) {
+      reloadFilms(filt);
+    } else {
+      setFilms([])
+    }
   }, [
-    filt
+    filt,
+    loggedIn
   ]);
 
   const removeFilm = async (id) => {
@@ -86,24 +105,53 @@ function App() {
     setMode('edit')
   }
 
+  const handleLogin = async (credentials) => {
+    try {
+      const user = await API.logIn(credentials);
+      setLoggedIn(true);
+      setMessage({ msg: `Welcome, ${user.name}!`, type: 'success' });
+    } catch (err) {
+      console.log(err);
+      setMessage({ msg: err, type: 'danger' });
+    }
+  };
+
+  const handleLogout = async () => {
+    await API.logOut();
+    setLoggedIn(false);
+    // clean up everything
+    setFilms([]);
+    //setMessage('');
+  };
+
 
   return (
-    <BrowserRouter>
-      <Routes>
+    <Container>
+      {loggedIn && <LogoutButton logout={handleLogout} />}
+      {message && <Row>
+        <Alert variant={message.type} onClose={() => setMessage('')} dismissible>{message.msg}</Alert>
+      </Row>}
+      <BrowserRouter>
+        <Routes>
+          <Route path='/login' element={
+            loggedIn ? <Navigate replace to='/' /> : <LoginForm login={handleLogin} />
+          } />
 
-        <Route element={<AppLayout />}>
-          <Route path='/' element={<FilmsPage filt={''} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} />} />
-          <Route path='/favorites' element={<FilmsPage filt={'favorites'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} />} />
-          <Route path='/bestrated' element={<FilmsPage filt={'bestrated'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} />} />
-          <Route path='/lastmonth' element={<FilmsPage filt={'lastmonth'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} />} />
-          <Route path='/unseen' element={<FilmsPage filt={'unseen'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} />} />
-          <Route path='/addFilm' element={<AddFilmPage mode={mode} setMode={setMode} addFilm={addFilm} />} />
-          <Route path='/editFilm' element={<EditFilmPage key={editedFilm.id} mode={mode} setMode={setMode} editFilm={editFilm} editedFilm={editedFilm} />} />
+          <Route element={<AppLayout />}>
+            <Route path='/' element={loggedIn ? <FilmsPage filt={''} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
+            <Route path='/favorites' element={loggedIn ? <FilmsPage filt={'favorites'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
+            <Route path='/bestrated' element={loggedIn ? <FilmsPage filt={'bestrated'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
+            <Route path='/lastmonth' element={loggedIn ? <FilmsPage filt={'lastmonth'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
+            <Route path='/unseen' element={loggedIn ? <FilmsPage filt={'unseen'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
+            <Route path='/addFilm' element={loggedIn ? <AddFilmPage mode={mode} setMode={setMode} addFilm={addFilm} /> : <Navigate replace to='/login' />} />
+            <Route path='/editFilm' element={loggedIn ? <EditFilmPage key={editedFilm.id} mode={mode} setMode={setMode} editFilm={editFilm} editedFilm={editedFilm} /> : <Navigate replace to='/login' />} />
+          </Route>
+
           <Route path='*' element={<h1>404 Page not found</h1>} />
-        </Route>
 
-      </Routes>
-    </BrowserRouter >
+        </Routes>
+      </BrowserRouter >
+    </Container>
   );
 }
 
