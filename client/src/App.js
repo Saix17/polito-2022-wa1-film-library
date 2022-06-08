@@ -101,9 +101,16 @@ function App() {
     }
   }
 
-  const changeRatingFilm = (film, value) => {
-    film.rating = value
-    setFilms((fs) => (fs.map((f) => (f.id === film.id ? film : f))));
+  const changeRatingFilm = async (film, value) => {
+    try {
+      setLoading(true);
+      film.rating = value
+      await API.editFilm(film);
+      reloadFilms();
+      setLoading(false);
+    } catch (e) {
+      throw (e);
+    }
   }
 
   const openEdit = (film) => {

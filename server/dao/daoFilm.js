@@ -110,7 +110,7 @@ function addFilm(user, film) {
 
 function updateFilm(user, film) {
     const sql = "UPDATE films SET title = ?, favorite = ?, watchdate = ?, rating = ?, user = ? WHERE id == ? AND user == ?"
-    const list = [film.title, film.favorite, film.watchDate, film.rating, film.user, film.id, user.id];
+    const list = [film.title, film.favorite, film.watchDate, film.rating, user.id, film.id, user.id];
     return new Promise((resolve, reject) => {
         db.run(sql, list, (err) => {
             if (err) {

@@ -165,7 +165,6 @@ app.post(PREFIX + '/films', [
     body('favorite').isNumeric(),
     body('rating').isNumeric(),
     body('watchDate').isISO8601(),
-    body('user').isNumeric(),
     isLoggedIn
 ], async (req, res) => {
     const film = req.body;
@@ -183,12 +182,12 @@ app.put(PREFIX + '/films', [
     body('favorite').isNumeric(),
     body('rating').isNumeric(),
     body('watchDate').isISO8601(),
-    body('user').isNumeric(),
     isLoggedIn
 ], async (req, res) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
+        console.log(errors)
         return res.status(400).json({ errors: errors.array() });
     }
     const film = req.body;
@@ -196,6 +195,7 @@ app.put(PREFIX + '/films', [
         const value = await filmDao.updateFilm(req.user, film);
         res.end();
     } catch (e) {
+        console.log(e)
         res.status(400).json({ error: e });
     }
 });

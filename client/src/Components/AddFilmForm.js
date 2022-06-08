@@ -21,7 +21,6 @@ function AddFilmForm(props) {
                 "favorite": favorite ? 1 : 0,
                 "rating": parseInt(rating),
                 "watchDate": watchDate,
-                "user": 1
             });
         }
 
@@ -32,7 +31,6 @@ function AddFilmForm(props) {
                 "favorite": favorite ? 1 : 0,
                 "rating": parseInt(rating),
                 "watchDate": watchDate,
-                "user": 1
             });
         }
 
