@@ -36,14 +36,23 @@ function App() {
     reloadFilms();
   }, []);
 
-  const removeFilm = (film) => {
-    setFilms((oldFilms) => (oldFilms.filter((f) => (f.id !== film.id))));
+  const removeFilm = async (id) => {
+    try {
+      setLoading(true);
+      await API.removeFilm(id);
+      reloadFilms();
+      setLoading(false);
+    } catch (e) {
+      throw (e);
+    }
   }
 
   const addFilm = async (film) => {
     try {
+      setLoading(true);
       await API.addFilm(film);
       reloadFilms();
+      setLoading(false);
     } catch (e) {
       throw (e);
     }
@@ -51,8 +60,10 @@ function App() {
 
   const editFilm = async (film) => {
     try {
+      setLoading(true);
       await API.editFilm(film);
       reloadFilms();
+      setLoading(false);
     } catch (e) {
       throw (e);
     }

@@ -22,7 +22,7 @@ function FilmData(props) {
               }} />
             </NavLink>
           </Col>
-          <Col xs={1}><Trash onClick={() => props.removeFilm(props.film)} /></Col>
+          <Col xs={1}><Trash onClick={() => props.removeFilm(props.film.id)} /></Col>
           <Col xs={3} className={props.film.favorite ? "Favorite" : ""}  >{props.film.title}</Col>
           <Col xs={3}>
             <label>
