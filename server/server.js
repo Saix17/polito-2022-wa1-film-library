@@ -49,35 +49,36 @@ app.use(session({
     secret: "shhhhh... it's a secret!",
     resave: false,
     saveUninitialized: false,
-  }));
-  app.use(passport.authenticate('session'));
+}));
+app.use(passport.authenticate('session'));
 
 const PREFIX = '/api/v1';
 
 /*** USER APIs ***/
 
-app.post(PREFIX +'/sessions', passport.authenticate('local'), (req, res) => {
+app.post(PREFIX + '/sessions', passport.authenticate('local'), (req, res) => {
     res.status(201).json(req.user);
-  });
+});
 
-app.get(PREFIX +'/sessions/current', (req, res) => {
-    if(req.isAuthenticated()) {
-      res.json(req.user);}
+app.get(PREFIX + '/sessions/current', (req, res) => {
+    if (req.isAuthenticated()) {
+        res.json(req.user);
+    }
     else
-      res.status(401).json({error: 'Not authenticated'});
+        res.status(401).json({ error: 'Not authenticated' });
 });
 
 app.delete(PREFIX + '/sessions/current', (req, res) => {
     req.logout(() => {
-      res.end();
+        res.end();
     });
-  });
+});
 
 
 /*** FILM APIs ***/
 
 app.get(PREFIX + '/films', isLoggedIn, (req, res) => {
-    filmDao.getAll().then(values =>
+    filmDao.getAll(req.user).then(values =>
         res.json(values)
     ).catch(
         (err) => {
@@ -86,8 +87,8 @@ app.get(PREFIX + '/films', isLoggedIn, (req, res) => {
     );
 });
 
-app.get(PREFIX + '/films/favorites',isLoggedIn, (req, res) => {
-    filmDao.getFavorites().then(
+app.get(PREFIX + '/films/favorites', isLoggedIn, (req, res) => {
+    filmDao.getFavorites(req.user).then(
         (value) => {
             res.json(value);
         }
@@ -99,7 +100,7 @@ app.get(PREFIX + '/films/favorites',isLoggedIn, (req, res) => {
 });
 
 app.get(PREFIX + '/films/lastmonth', isLoggedIn, (req, res) => {
-    filmDao.getAll().then(
+    filmDao.getAll(req.user).then(
         (value) => value.filter(v => v.isSeenLastMonth))
         .then(valuelm => {
             console.log(valuelm);
@@ -114,7 +115,7 @@ app.get(PREFIX + '/films/lastmonth', isLoggedIn, (req, res) => {
 
 
 app.get(PREFIX + '/films/bestrated', isLoggedIn, (req, res) => {
-    filmDao.getBestRated().then(
+    filmDao.getBestRated(req.user).then(
         (value) => {
             res.json(value);
         }
@@ -126,7 +127,7 @@ app.get(PREFIX + '/films/bestrated', isLoggedIn, (req, res) => {
 });
 
 app.get(PREFIX + '/films/unseen', isLoggedIn, (req, res) => {
-    filmDao.getUnseen().then(
+    filmDao.getUnseen(req.user).then(
         (value) => {
             res.json(value);
         }
@@ -147,7 +148,7 @@ app.get(PREFIX + '/films/:id', [
         return res.status(400).json({ errors: errors.array() });
     }
 
-    filmDao.getById(req.params.id).then(
+    filmDao.getById(req.user, req.params.id).then(
         (value) => {
             console.log(value.title);
             res.json(value);
@@ -169,7 +170,7 @@ app.post(PREFIX + '/films', [
 ], async (req, res) => {
     const film = req.body;
     try {
-        const value = await filmDao.addFilm(film);
+        const value = await filmDao.addFilm(req.user, film);
         res.end();
     } catch (e) {
         res.status(400).json({ error: e });
@@ -192,7 +193,7 @@ app.put(PREFIX + '/films', [
     }
     const film = req.body;
     try {
-        const value = await filmDao.updateFilm(film);
+        const value = await filmDao.updateFilm(req.user, film);
         res.end();
     } catch (e) {
         res.status(400).json({ error: e });
@@ -213,7 +214,7 @@ app.put(PREFIX + '/films/:id', [
         dao.getById(req.params.id).then(
             v => {
                 v.favorite = (v.favorite + 1) % 2;
-                filmDao.updateFilm(v);
+                filmDao.updateFilm(req.user, v);
                 res.end();
             }
         )
@@ -233,7 +234,7 @@ app.delete(PREFIX + '/films/:id', [
     }
 
     try {
-        const value = await filmDao.removeFilm(req.params.id);
+        const value = await filmDao.removeFilm(req.user, req.params.id);
         res.end();
     } catch (e) {
         res.status(400).json({ error: e })
