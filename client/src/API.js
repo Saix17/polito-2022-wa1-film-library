@@ -107,6 +107,28 @@ async function editFilm(film) {
 }
 
 
+async function favoriteFilm(id) {
+    const url = APIURL + `/films/${id}`;
+    try {
+        const response = await fetch(url, {
+            method: 'PUT',
+            credentials: 'include',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+        if (response.ok) {
+            return true;
+        } else {
+            const text = await response.text();
+            throw new TypeError(text);
+        }
+    } catch (ex) {
+        throw ex;
+    }
+}
+
+
 async function removeFilm(id) {
     const url = APIURL + `/films/${id}`;
     try {
@@ -125,5 +147,5 @@ async function removeFilm(id) {
     }
 }
 
-const API = { readFilms, addFilm, editFilm, removeFilm, logIn, getUserInfo, logOut };
+const API = { readFilms, addFilm, editFilm, removeFilm, logIn, getUserInfo, logOut, favoriteFilm };
 export default API;

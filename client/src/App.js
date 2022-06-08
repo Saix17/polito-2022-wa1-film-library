@@ -90,9 +90,15 @@ function App() {
     }
   }
 
-  const changeFavoriteFilm = (film) => {
-    film.favorite = !film.favorite
-    setFilms((fs) => (fs.map((f) => (f.id === film.id ? film : f))));
+  const changeFavoriteFilm = async (film) => {
+    try {
+      setLoading(true);
+      await API.favoriteFilm(film.id);
+      reloadFilms();
+      setLoading(false);
+    } catch (e) {
+      throw (e);
+    }
   }
 
   const changeRatingFilm = (film, value) => {

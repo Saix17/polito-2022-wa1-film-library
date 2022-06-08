@@ -206,12 +206,13 @@ app.put(PREFIX + '/films/:id', [
 ], async (req, res) => {
 
     const errors = validationResult(req);
+
     if (!errors.isEmpty()) {
         return res.status(400).json({ errors: errors.array() });
     }
 
     try {
-        dao.getById(req.params.id).then(
+        filmDao.getById(req.user, req.params.id).then(
             v => {
                 v.favorite = (v.favorite + 1) % 2;
                 filmDao.updateFilm(req.user, v);
@@ -219,6 +220,7 @@ app.put(PREFIX + '/films/:id', [
             }
         )
     } catch (e) {
+        console.log(e)
         res.status(400).json({ error: e });
     }
 });
