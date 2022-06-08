@@ -14,24 +14,22 @@ function AddFilmForm(props) {
     const handleSubmit = (event) => {
         event.preventDefault();
         if (props.mode === 'edit') {
-            /*
             var id = props.editedFilm.id
             props.editFilm({
                 "id": id,
                 "title": title,
-                "favorite": favorite,
+                "favorite": favorite ? 1 : 0,
                 "rating": parseInt(rating),
                 "watchDate": watchDate,
                 "user": 1
             });
-            */
         }
-        
-        
+
+
         if (props.mode === 'add') {
             props.addFilm({
                 "title": title,
-                "favorite": favorite,
+                "favorite": favorite ? 1 : 0,
                 "rating": parseInt(rating),
                 "watchDate": watchDate,
                 "user": 1

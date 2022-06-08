@@ -7,10 +7,10 @@ async function readFilms() {
     try {
         const response = await fetch(url);
         if (response.ok) {
-           
+
             const list = await response.json();
             console.log(list)
-            const filmList = list.map((f)=>new Film(f.id, f.title, f.favorite, f.watchDate, f.rating));
+            const filmList = list.map((f) => new Film(f.id, f.title, f.favorite, f.watchDate, f.rating));
             return filmList;
         } else {
             const text = await response.text();
@@ -44,14 +44,14 @@ async function addFilm(film) {
     }
 }
 
-/*
 
-async function editExam(exam) {
-    const url = APIURL + '/exams';
+
+async function editFilm(film) {
+    const url = APIURL + '/films';
     try {
         const response = await fetch(url, {
             method: 'PUT',
-            body: JSON.stringify(exam),
+            body: JSON.stringify(film),
             headers: {
                 'Content-Type': 'application/json'
             }
@@ -67,6 +67,7 @@ async function editExam(exam) {
     }
 }
 
+/*
 async function removeExam(code) {
     const url = APIURL+ `/exams/${code}`;
     try {
@@ -84,5 +85,5 @@ async function removeExam(code) {
     }
 }*/
 
-const API = { readFilms, addFilm};
-export default API ;
+const API = { readFilms, addFilm, editFilm };
+export default API;

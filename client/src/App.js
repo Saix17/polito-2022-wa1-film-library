@@ -45,12 +45,17 @@ function App() {
       await API.addFilm(film);
       reloadFilms();
     } catch (e) {
-      throw(e);
+      throw (e);
     }
   }
 
-  const editFilm = (film) => {
-    setFilms((fs) => (fs.map((f) => (f.id === film.id ? film : f))));
+  const editFilm = async (film) => {
+    try {
+      await API.editFilm(film);
+      reloadFilms();
+    } catch (e) {
+      throw (e);
+    }
   }
 
   const changeFavoriteFilm = (film) => {
