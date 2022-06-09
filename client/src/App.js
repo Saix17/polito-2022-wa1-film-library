@@ -4,7 +4,6 @@ import { BrowserRouter, Outlet, Route, Routes, Navigate } from 'react-router-dom
 import { Col, Row, Container, Alert } from 'react-bootstrap';
 
 
-import { load_data } from './Components/Load_data';
 import { useEffect, useState } from 'react';
 import { MyNavbar } from './Components/Navbar';
 import { Sidebar } from './Components/SideBar';
@@ -15,8 +14,6 @@ import { Film } from './Components/Film';
 
 import API from './API'
 import { LoginForm, LogoutButton } from './Components/Auth';
-
-const filmsData = load_data();
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -39,8 +36,10 @@ function App() {
 
   useEffect(() => {
     const checkAuth = async () => {
-      await API.getUserInfo();
-      setLoggedIn(true);
+      try {
+        await API.getUserInfo();
+        setLoggedIn(true);
+      } catch (error) { }
     };
     checkAuth();
   }, []);
@@ -134,7 +133,7 @@ function App() {
     setLoggedIn(false);
     // clean up everything
     setFilms([]);
-    //setMessage('');
+    setMessage('');
   };
 
 
@@ -147,13 +146,13 @@ function App() {
           } />
 
           <Route element={<AppLayout loggedIn={loggedIn} handleLogout={handleLogout} message={message} setMessage={setMessage} />}>
-            <Route path='/' element={loggedIn ? <FilmsPage filt={''} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
-            <Route path='/favorites' element={loggedIn ? <FilmsPage filt={'favorites'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
-            <Route path='/bestrated' element={loggedIn ? <FilmsPage filt={'bestrated'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
-            <Route path='/lastmonth' element={loggedIn ? <FilmsPage filt={'lastmonth'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
-            <Route path='/unseen' element={loggedIn ? <FilmsPage filt={'unseen'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
-            <Route path='/addFilm' element={loggedIn ? <AddFilmPage mode={mode} setMode={setMode} addFilm={addFilm} /> : <Navigate replace to='/login' />} />
-            <Route path='/editFilm' element={loggedIn ? <EditFilmPage key={editedFilm.id} mode={mode} setMode={setMode} editFilm={editFilm} editedFilm={editedFilm} /> : <Navigate replace to='/login' />} />
+            <Route path='/' element={loggedIn ? <FilmsPage loading={loading} filt={''} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
+            <Route path='/favorites' element={loggedIn ? <FilmsPage loading={loading} filt={'favorites'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
+            <Route path='/bestrated' element={loggedIn ? <FilmsPage loading={loading} filt={'bestrated'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
+            <Route path='/lastmonth' element={loggedIn ? <FilmsPage loading={loading} filt={'lastmonth'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
+            <Route path='/unseen' element={loggedIn ? <FilmsPage loading={loading} filt={'unseen'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
+            <Route path='/addFilm' element={loggedIn ? <AddFilmPage loading={loading} mode={mode} setMode={setMode} addFilm={addFilm} /> : <Navigate replace to='/login' />} />
+            <Route path='/editFilm' element={loggedIn ? <EditFilmPage loading={loading} key={editedFilm.id} mode={mode} setMode={setMode} editFilm={editFilm} editedFilm={editedFilm} /> : <Navigate replace to='/login' />} />
           </Route>
 
           <Route path='*' element={<h1>404 Page not found</h1>} />
@@ -165,7 +164,11 @@ function App() {
 }
 
 function FilmsPage(props) {
-  props.setFilt(props.filt)
+
+  useEffect(() => {
+    props.setFilt(props.filt)
+  });
+
   const filterToText = function () {
     switch (props.filt) {
       case '':
@@ -190,14 +193,14 @@ function FilmsPage(props) {
       </Col>
       <Col >
         <h1>Filter: {filterToText()}</h1>
-        <FilmTable
+        {!props.loading && <FilmTable
           filt={props.filt}
           films={props.films}
           changeFavoriteFilm={props.changeFavoriteFilm}
           changeRatingFilm={props.changeRatingFilm}
           openEdit={props.openEdit}
           removeFilm={props.removeFilm}
-        />
+        />}
         <AddButton setMode={props.setMode} />
       </Col>
     </Row>
@@ -210,11 +213,11 @@ function AddFilmPage(props) {
       <Col>
         <div>
           <h1>Add film</h1>
-          <AddFilmForm
+          {!props.loading && <AddFilmForm
             mode={props.mode}
             setMode={props.setMode}
             addFilm={props.addFilm}
-          />
+          />}
         </div>
       </Col>
     </Row>
@@ -227,13 +230,13 @@ function EditFilmPage(props) {
       <Col>
         <div>
           <h1>Edit film</h1>
-          <AddFilmForm
+          {!props.loading &&  <AddFilmForm
             key={props.editedFilm.id}
             mode={props.mode}
             setMode={props.setMode}
             editFilm={props.editFilm}
             editedFilm={props.editedFilm}
-          />
+          />}
         </div>
       </Col>
     </Row>

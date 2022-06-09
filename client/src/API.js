@@ -10,7 +10,6 @@ async function readFilms(filt) {
         });
         if (response.ok) {
             const list = await response.json();
-            console.log(list)
             const filmList = list.map((f) => new Film(f.id, f.title, f.favorite, f.watchDate, f.rating));
             return filmList;
         } else {

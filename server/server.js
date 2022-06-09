@@ -3,7 +3,7 @@
 const express = require('express');
 const morgan = require('morgan');
 const cors = require('cors');
-const { validationResult, body, param } = require('express-validator');
+const { validationResult, body, param, oneOf } = require('express-validator');
 const filmDao = require('./dao/daoFilm');
 const userDao = require('./dao/daoUser');
 const passport = require('passport');
@@ -35,7 +35,6 @@ passport.serializeUser(function (user, cb) {
 
 passport.deserializeUser(function (user, cb) {
     return cb(null, user);
-    // if needed, we can do extra check here (e.g., double check that the user is still in the database, etc.)
 });
 
 const isLoggedIn = (req, res, next) => {
@@ -103,7 +102,6 @@ app.get(PREFIX + '/films/lastmonth', isLoggedIn, (req, res) => {
     filmDao.getAll(req.user).then(
         (value) => value.filter(v => v.isSeenLastMonth))
         .then(valuelm => {
-            console.log(valuelm);
             res.json(valuelm)
         }
         ).catch(
@@ -150,7 +148,6 @@ app.get(PREFIX + '/films/:id', [
 
     filmDao.getById(req.user, req.params.id).then(
         (value) => {
-            console.log(value.title);
             res.json(value);
         }
     ).catch(
@@ -181,13 +178,15 @@ app.put(PREFIX + '/films', [
     body('title').not().isEmpty(),
     body('favorite').isNumeric(),
     body('rating').isNumeric(),
-    body('watchDate').isISO8601(),
+    oneOf([
+        body('watchDate').isISO8601(),
+        body('watchDate').isEmpty(),
+      ]),
     isLoggedIn
 ], async (req, res) => {
 
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        console.log(errors)
         return res.status(400).json({ errors: errors.array() });
     }
     const film = req.body;
@@ -195,7 +194,6 @@ app.put(PREFIX + '/films', [
         const value = await filmDao.updateFilm(req.user, film);
         res.end();
     } catch (e) {
-        console.log(e)
         res.status(400).json({ error: e });
     }
 });
@@ -220,7 +218,6 @@ app.put(PREFIX + '/films/:id', [
             }
         )
     } catch (e) {
-        console.log(e)
         res.status(400).json({ error: e });
     }
 });
@@ -245,12 +242,3 @@ app.delete(PREFIX + '/films/:id', [
 
 
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}/`));
-
-/*{ for (const film of values){
-
-    if (film.watchDate !== null)
-                film.watchDate = film.watchDate.format('YYYY-MM-DD')
-        }
-           return values; 
-        })
-        .then(value =>*/

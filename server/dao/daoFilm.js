@@ -140,7 +140,7 @@ function setFavorite(user, id, favorite) {
 function removeFilm(user, id) {
     const sql = "DELETE FROM films WHERE id = ? AND user == ?"
     return new Promise((resolve, reject) => {
-        db.run(sql, [id, , user.id], (err) => {
+        db.run(sql, [id, user.id], (err) => {
             if (err) {
                 reject(err);
             }

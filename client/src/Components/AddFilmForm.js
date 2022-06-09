@@ -9,7 +9,7 @@ function AddFilmForm(props) {
     const [title, setTitle] = useState(props.mode === 'edit' ? props.editedFilm.title : '');
     const [favorite, setFavorite] = useState(props.mode === 'edit' ? props.editedFilm.favorite : false);
     const [rating, setRating] = useState(props.mode === 'edit' ? props.editedFilm.rating : 0);
-    const [watchDate, setWatchDate] = useState(props.mode === 'edit' ? (props.editedFilm.watchDate && props.editedFilm.watchDate.format('YYYY-MM-DD')) : '');
+    const [watchDate, setWatchDate] = useState(props.mode === 'edit' && props.editedFilm.watchDate ? props.editedFilm.watchDate.format('YYYY-MM-DD') : '');
 
     const handleSubmit = (event) => {
         event.preventDefault();
@@ -20,7 +20,7 @@ function AddFilmForm(props) {
                 "title": title,
                 "favorite": favorite ? 1 : 0,
                 "rating": parseInt(rating),
-                "watchDate": watchDate,
+                "watchDate": watchDate != '' ? watchDate : null,
             });
         }
 
@@ -30,7 +30,7 @@ function AddFilmForm(props) {
                 "title": title,
                 "favorite": favorite ? 1 : 0,
                 "rating": parseInt(rating),
-                "watchDate": watchDate,
+                "watchDate": watchDate != '' ? watchDate : null,
             });
         }
 
