@@ -13,7 +13,7 @@ import { AddFilmForm } from './Components/AddFilmForm';
 import { Film } from './Components/Film';
 
 import API from './API'
-import { LoginForm, LogoutButton } from './Components/Auth';
+import { LoginForm } from './Components/Auth';
 
 function App() {
   const [loading, setLoading] = useState(true);
@@ -60,7 +60,7 @@ function App() {
     try {
       setLoading(true);
       await API.removeFilm(id);
-      reloadFilms();
+      reloadFilms(filt);
       setLoading(false);
     } catch (e) {
       throw (e);
@@ -71,7 +71,7 @@ function App() {
     try {
       setLoading(true);
       await API.addFilm(film);
-      reloadFilms();
+      reloadFilms(filt);
       setLoading(false);
     } catch (e) {
       throw (e);
@@ -82,7 +82,7 @@ function App() {
     try {
       setLoading(true);
       await API.editFilm(film);
-      reloadFilms();
+      reloadFilms(filt);
       setLoading(false);
     } catch (e) {
       throw (e);
@@ -93,7 +93,7 @@ function App() {
     try {
       setLoading(true);
       await API.favoriteFilm(film.id);
-      reloadFilms();
+      reloadFilms(filt);
       setLoading(false);
     } catch (e) {
       throw (e);
@@ -101,14 +101,16 @@ function App() {
   }
 
   const changeRatingFilm = async (film, value) => {
-    try {
-      setLoading(true);
-      film.rating = value
-      await API.editFilm(film);
-      reloadFilms();
-      setLoading(false);
-    } catch (e) {
-      throw (e);
+    if(value != film.rating){
+      try {
+        setLoading(true);
+        film.rating = value
+        await API.editFilm(film);
+        reloadFilms(filt);
+        setLoading(false);
+      } catch (e) {
+        throw (e);
+      }
     }
   }
 
@@ -123,8 +125,7 @@ function App() {
       setLoggedIn(true);
       setMessage({ msg: `Welcome, ${user.name}!`, type: 'success' });
     } catch (err) {
-      console.log(err);
-      setMessage({ msg: err, type: 'danger' });
+      setMessage({ msg: 'Incorrect username or password', type: 'danger' });
     }
   };
 
@@ -139,13 +140,17 @@ function App() {
 
   return (
     <div className="App">
+      {message && <Row>
+        <Alert variant={message.type} onClose={() => setMessage('')} dismissible>{message.msg}</Alert>
+      </Row>}
+
       <BrowserRouter>
         <Routes>
           <Route path='/login' element={
             loggedIn ? <Navigate replace to='/' /> : <LoginForm login={handleLogin} />
           } />
 
-          <Route element={<AppLayout loggedIn={loggedIn} handleLogout={handleLogout} message={message} setMessage={setMessage} />}>
+          <Route element={<AppLayout loggedIn={loggedIn} handleLogout={handleLogout} />}>
             <Route path='/' element={loggedIn ? <FilmsPage loading={loading} filt={''} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
             <Route path='/favorites' element={loggedIn ? <FilmsPage loading={loading} filt={'favorites'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
             <Route path='/bestrated' element={loggedIn ? <FilmsPage loading={loading} filt={'bestrated'} setFilt={setFilt} films={films} changeFavoriteFilm={changeFavoriteFilm} changeRatingFilm={changeRatingFilm} openEdit={openEdit} removeFilm={removeFilm} setMode={setMode} /> : <Navigate replace to='/login' />} />
@@ -230,7 +235,7 @@ function EditFilmPage(props) {
       <Col>
         <div>
           <h1>Edit film</h1>
-          {!props.loading &&  <AddFilmForm
+          {!props.loading && <AddFilmForm
             key={props.editedFilm.id}
             mode={props.mode}
             setMode={props.setMode}
@@ -246,11 +251,7 @@ function EditFilmPage(props) {
 function AppLayout(props) {
   return (
     <div>
-      {props.loggedIn && <LogoutButton logout={props.handleLogout} />}
-      {props.message && <Row>
-        <Alert variant={props.message.type} onClose={() => props.setMessage('')} dismissible>{props.message.msg}</Alert>
-      </Row>}
-      <MyNavbar />
+      <MyNavbar loggedIn={props.loggedIn} handleLogout={props.handleLogout} />
       <Container className="Content" fluid>
         <Outlet />
       </Container>

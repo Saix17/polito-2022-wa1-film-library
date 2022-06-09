@@ -1,11 +1,12 @@
 import React from 'react';
 import { Form, Container, Navbar } from 'react-bootstrap';
-import { PersonCircle } from 'react-bootstrap-icons';
+import { PersonCircle, BoxArrowRight } from 'react-bootstrap-icons';
+import { LogoutButton } from './Auth';
 import { NavLink } from 'react-router-dom';
 
 import 'bootstrap/dist/css/bootstrap.css';
 
-const MyNavbar = () => {
+const MyNavbar = (props) => {
   return (
     <Navbar bg="primary" variant="dark" className="Navbar">
       <Container fluid>
@@ -33,7 +34,7 @@ const MyNavbar = () => {
         </Navbar.Collapse>
         <Navbar.Collapse className="justify-content-end">
           <Navbar.Text>
-            <PersonCircle color="white" size={32} />
+            {props.loggedIn && <LogoutButton logout={props.handleLogout} />}
           </Navbar.Text>
         </Navbar.Collapse>
       </Container>

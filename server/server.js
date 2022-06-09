@@ -45,7 +45,7 @@ const isLoggedIn = (req, res, next) => {
 }
 
 app.use(session({
-    secret: "shhhhh... it's a secret!",
+    secret: "iperReactive",
     resave: false,
     saveUninitialized: false,
 }));
