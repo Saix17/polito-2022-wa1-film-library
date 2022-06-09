@@ -101,7 +101,7 @@ function App() {
   }
 
   const changeRatingFilm = async (film, value) => {
-    if(value != film.rating){
+    if (value != film.rating) {
       try {
         setLoading(true);
         film.rating = value
@@ -147,7 +147,7 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path='/login' element={
-            loggedIn ? <Navigate replace to='/' /> : <LoginForm login={handleLogin} />
+            loggedIn ? <Navigate replace to='/' /> : <LoginPage login={handleLogin} />
           } />
 
           <Route element={<AppLayout loggedIn={loggedIn} handleLogout={handleLogout} />}>
@@ -198,15 +198,16 @@ function FilmsPage(props) {
       </Col>
       <Col >
         <h1>Filter: {filterToText()}</h1>
-        {!props.loading && <FilmTable
-          filt={props.filt}
-          films={props.films}
-          changeFavoriteFilm={props.changeFavoriteFilm}
-          changeRatingFilm={props.changeRatingFilm}
-          openEdit={props.openEdit}
-          removeFilm={props.removeFilm}
-        />}
-        <AddButton setMode={props.setMode} />
+        {!props.loading &&
+          <FilmTable
+            filt={props.filt}
+            films={props.films}
+            changeFavoriteFilm={props.changeFavoriteFilm}
+            changeRatingFilm={props.changeRatingFilm}
+            openEdit={props.openEdit}
+            removeFilm={props.removeFilm}
+          />}
+        {!props.loading && <AddButton setMode={props.setMode} />}
       </Col>
     </Row>
   );
@@ -248,11 +249,23 @@ function EditFilmPage(props) {
   );
 }
 
+
+function LoginPage(props) {
+  return (
+    <Container className="Auth-form-container">
+      <Row className="align-items-center Auth-form" class="fill">
+        <Col md={{ span: 6, offset: 3 }}><LoginForm login={props.login} /></Col>
+      </Row>
+    </Container>
+  );
+}
+
+
 function AppLayout(props) {
   return (
     <div>
       <MyNavbar loggedIn={props.loggedIn} handleLogout={props.handleLogout} />
-      <Container className="Content" fluid>
+      <Container className="Content">
         <Outlet />
       </Container>
     </div>

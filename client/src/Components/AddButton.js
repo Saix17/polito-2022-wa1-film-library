@@ -8,7 +8,7 @@ function AddButton(props) {
             <Button variant="primary" onClick={() => {
                 props.setMode('add')
             }}>
-                <PlusCircle size={42} />
+                <PlusCircle size={32} />
             </Button>
         </NavLink>
     </p>;

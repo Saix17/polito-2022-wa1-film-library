@@ -9,7 +9,7 @@ import 'bootstrap/dist/css/bootstrap.css';
 const MyNavbar = (props) => {
   return (
     <Navbar bg="primary" variant="dark" className="Navbar">
-      <Container fluid>
+      <Container>
         <Navbar.Brand >
           <NavLink to="/" className="logo">
             <img

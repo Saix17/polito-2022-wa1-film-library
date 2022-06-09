@@ -11,16 +11,14 @@
 }
 
 .Content {
-  min-height: 80vh;
+  padding-top: 16px;
 }
 
 .Menu {
-  min-height: 80vh;
   margin-right: 8px;
 }
 
 .Drawer {
-  min-height: 80vh;
   margin: 16px 16px 16px 16px;
 }
 
@@ -50,4 +48,13 @@
 
 .navItem {
   text-decoration: none;
+}
+
+.Auth-form-container {
+  height: 100vh;
+}
+
+.Auth-form {
+  align-items: center;
+  height: 100vh;
 }
