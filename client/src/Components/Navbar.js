@@ -1,6 +1,5 @@
 import React from 'react';
 import { Form, Container, Navbar } from 'react-bootstrap';
-import { PersonCircle, BoxArrowRight } from 'react-bootstrap-icons';
 import { LogoutButton } from './Auth';
 import { NavLink } from 'react-router-dom';
 

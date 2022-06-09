@@ -101,7 +101,7 @@ function App() {
   }
 
   const changeRatingFilm = async (film, value) => {
-    if (value != film.rating) {
+    if (value !== film.rating) {
       try {
         setLoading(true);
         film.rating = value

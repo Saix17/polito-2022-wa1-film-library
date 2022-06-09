@@ -181,7 +181,7 @@ app.put(PREFIX + '/films', [
     oneOf([
         body('watchDate').isISO8601(),
         body('watchDate').isEmpty(),
-      ]),
+    ]),
     isLoggedIn
 ], async (req, res) => {
 
