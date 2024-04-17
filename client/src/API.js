@@ -2,25 +2,6 @@ import { Film } from "./Components/Film";
 
 const APIURL = 'http://localhost:3001/api/v1';
 
-async function readFilms(filt) {
-    var url = APIURL + '/films/' + (filt ?? '');
-    try {
-        const response = await fetch(url, {
-            credentials: 'include',
-        });
-        if (response.ok) {
-            const list = await response.json();
-            const filmList = list.map((f) => new Film(f.id, f.title, f.favorite, f.watchDate, f.rating));
-            return filmList;
-        } else {
-            const text = await response.text();
-            throw new TypeError(text);
-        }
-    } catch (ex) {
-        throw ex;
-    }
-}
-
 const logIn = async (credentials) => {
     const response = await fetch(APIURL + '/sessions', {
         method: 'POST',
@@ -39,6 +20,25 @@ const logIn = async (credentials) => {
         throw errDetails;
     }
 };
+
+async function readFilms(filt) {
+    var url = APIURL + '/films/' + (filt ?? '');
+    try {
+        const response = await fetch(url, {
+            credentials: 'include',
+        });
+        if (response.ok) {
+            const list = await response.json();
+            const filmList = list.map((f) => new Film(f.id, f.title, f.favorite, f.watchDate, f.rating));
+            return filmList;
+        } else {
+            const text = await response.text();
+            throw new TypeError(text);
+        }
+    } catch (ex) {
+        throw ex;
+    }
+}
 
 const getUserInfo = async () => {
     const response = await fetch(APIURL + '/sessions/current', {

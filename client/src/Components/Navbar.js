@@ -1,4 +1,4 @@
-import React from 'react';
+import {React, useState} from 'react';
 import { Form, Container, Navbar } from 'react-bootstrap';
 import { LogoutButton } from './Auth';
 import { NavLink } from 'react-router-dom';
@@ -6,6 +6,9 @@ import { NavLink } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.css';
 
 const MyNavbar = (props) => {
+  const [click, setClick] = useState(false);
+  const handleClick = () => setClick(!click);
+
   return (
     <Navbar bg="primary" variant="dark" className="Navbar">
       <Container>
